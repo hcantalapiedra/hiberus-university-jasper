@@ -1,6 +1,5 @@
 package com.hiberus.university;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +21,8 @@ public class Main {
 
 	public static void main(String[] args) {
 
-        // 1. Generar el documento PDF con un fichero compilado (.jasper)
-        generatePdfFromJasper();
+		// 1. Generar el documento PDF con un fichero compilado (.jasper)
+		generatePdfFromJasper();
 
 	}
 
@@ -31,31 +30,26 @@ public class Main {
 		try {
 			logger.info("Main.generatePdfFromJasper() - Init");
 
-            // 1. Cargar el archivo .jasper ya compilado
-            String jasperFile = "src/main/resources/templates/report_template.jasper";
-            JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(jasperFile);
+			// 1. Cargar el archivo .jasper ya compilado
+			String jasperFile = "src/main/resources/templates/report_template.jasper";
+			JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(jasperFile);
 
-			// 2. Crear el bean con el valor de varOne
-			Map<String, Object> fieldList = new HashMap<>();
-			fieldList.put("varOne", "Hiberus University");
-			fieldList.put("varTwo", "Hiberus University Bold");
-			fieldList.put("varThree", null);
+			// 2. Crear la lista de elementos de la tabla
+			List<Tools> toolsList = ToolDataProvider.generateToolsList();
 
-			// 3. Crear una lista de datos para el reporte
-			List<Map<String, Object>> dataList = new ArrayList<>();
-			dataList.add(fieldList);
+			// 3. Crear un JRDataSource basado en la lista de datos
+			JRBeanCollectionDataSource toolsListDS = new JRBeanCollectionDataSource(toolsList);
 
-			// 4. Crear un JRDataSource basado en la lista de datos
-			JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(dataList);
-
-			// 5. Proporcionar parametros
+			// 4. Proporcionar parametros
 			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("imgCabecera", "src/main/resources/images/logo.png");
+			parameters.put("toolsList", toolsListDS);
 
-			// 6. Llenar el reporte (por ejemplo, se puede conectar a una base de datos)
-			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+			// 5. Llenar el reporte (por ejemplo, se puede conectar a una base de datos)
+			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
+					new net.sf.jasperreports.engine.JREmptyDataSource());
 
-			// 7. Exportar el reporte a PDF
+			// 6. Exportar el reporte a PDF
 			String pdfFile = "src/main/resources/output/report1.pdf";
 			JasperExportManager.exportReportToPdfFile(jasperPrint, pdfFile);
 
