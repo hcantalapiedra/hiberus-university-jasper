@@ -1,17 +1,19 @@
 package com.hiberus.university;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 
 public class Main {
@@ -20,59 +22,41 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		// 1. Generar el documento PDF con un fichero sin compilar (.jrxml)
-		generatePdfFromJrxml();
+        // 1. Generar el documento PDF con un fichero compilado (.jasper)
+        generatePdfFromJasper();
 
-		// 2. Generar el documento PDF con un fichero compilado (.jasper)
-		generatePdfFromJasper();
-	}
-
-	private static void generatePdfFromJrxml() {
-		try {
-			logger.info("Main.generatePdfFromJrxml() - Init");
-
-			// 1. Compilar el archivo .jrxml a un archivo .jasper
-			String jrxmlFile = "src/main/resources/templates/report_template.jrxml";
-			JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlFile);
-
-			// 2. Proporcionar parametros si es necesario (en este ejemplo no hay)
-			Map<String, Object> parameters = new HashMap<>();
-
-			// 3. Llenar el reporte (por ejemplo, se puede conectar a una base de datos)
-			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
-					new net.sf.jasperreports.engine.JREmptyDataSource());
-
-			// 4. Exportar el reporte a PDF
-			String pdfFile = "src/main/resources/output/report1.pdf";
-			JasperExportManager.exportReportToPdfFile(jasperPrint, pdfFile);
-
-			logger.debug("Report successfully generated at: " + pdfFile);
-
-		} catch (JRException e) {
-			logger.error("Main.generatePdfFromJrxml() - JRException", e.getMessage());
-			logger.error("Exception message:", e);
-		} finally {
-			logger.info("Main.generatePdfFromJrxml() - End");
-		}
 	}
 
 	private static void generatePdfFromJasper() {
 		try {
 			logger.info("Main.generatePdfFromJasper() - Init");
 
-			// 1. Cargar el archivo .jasper ya compilado
-			String jasperFile = "src/main/resources/templates/report_template.jasper";
-			JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(jasperFile);
+            // 1. Cargar el archivo .jasper ya compilado
+            String jasperFile = "src/main/resources/templates/report_template.jasper";
+            JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(jasperFile);
 
-			// 2. Proporcionar parametros si es necesario (en este ejemplo no hay)
+			// 2. Crear el bean con el valor de varOne
+			Map<String, Object> fieldList = new HashMap<>();
+			fieldList.put("varOne", "Hiberus University");
+			fieldList.put("varTwo", "Hiberus University Bold");
+			fieldList.put("varThree", null);
+
+			// 3. Crear una lista de datos para el reporte
+			List<Map<String, Object>> dataList = new ArrayList<>();
+			dataList.add(fieldList);
+
+			// 4. Crear un JRDataSource basado en la lista de datos
+			JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(dataList);
+
+			// 5. Proporcionar parametros
 			Map<String, Object> parameters = new HashMap<>();
+			parameters.put("imgCabecera", "src/main/resources/images/logo.png");
 
-			// 3. Llenar el reporte (por ejemplo, se puede conectar a una base de datos)
-			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
-					new net.sf.jasperreports.engine.JREmptyDataSource());
+			// 6. Llenar el reporte (por ejemplo, se puede conectar a una base de datos)
+			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
-			// 4. Exportar el reporte a PDF
-			String pdfFile = "src/main/resources/output/report2.pdf";
+			// 7. Exportar el reporte a PDF
+			String pdfFile = "src/main/resources/output/report1.pdf";
 			JasperExportManager.exportReportToPdfFile(jasperPrint, pdfFile);
 
 			logger.debug("Report successfully generated at: " + pdfFile);
@@ -84,4 +68,5 @@ public class Main {
 			logger.info("Main.generatePdfFromJasper() - End");
 		}
 	}
+
 }

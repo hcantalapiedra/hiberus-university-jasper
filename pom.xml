@@ -12,6 +12,19 @@
 			<artifactId>jasperreports</artifactId>
 			<version>6.20.0</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-fonts</artifactId>
+			<version>6.20.0</version>
+		</dependency>
+		<!-- FontArial dependency -->
+		<dependency>
+			<groupId>ArialPDF</groupId>
+			<artifactId>font-Arial</artifactId>
+			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/font-Arial-1.0.0.jar</systemPath>
+		</dependency>
 		<!-- Log4j dependency -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
